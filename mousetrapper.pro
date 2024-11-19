@@ -20,3 +20,6 @@ SOURCES += \
 RESOURCES += \
 	mice.qrc
 
+DISTFILES += \
+    README.md
+
