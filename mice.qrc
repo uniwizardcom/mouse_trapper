@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/">
+        <file>images/cheese.jpg</file>
+        <file>images/crosshair-symmetry-sniper.png</file>
+        <file>images/bullet.png</file>
+        <file>images/dziura.png</file>
+    </qresource>
+</RCC>
