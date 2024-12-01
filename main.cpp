@@ -17,7 +17,7 @@ int main(int argc, char **argv)
     scene.setSceneRect(-300, -300, 600, 600);
     scene.setItemIndexMethod(QGraphicsScene::NoIndex);
 
-    scene.setNewLevel(10);
+    scene.setNewLevel(1);
 
     QPixmap ps = QPixmap(":/images/crosshair-symmetry-sniper.png").scaledToWidth(100);
     QCursor c = QCursor(ps, ps.width() / 2, ps.height() / 2);
