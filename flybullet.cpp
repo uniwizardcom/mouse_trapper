@@ -7,7 +7,8 @@
 #include <QTimer>
 #include <QDebug>
 
-FlyBullet::FlyBullet(QObject *parent) : QThread{parent}
+FlyBullet::FlyBullet(QObject *parent)
+    : QThread{parent}
 {
 }
 

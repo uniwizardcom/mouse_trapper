@@ -8,10 +8,12 @@
 QT += widgets core
 
 HEADERS += \
+	choicelevel.h \
 	flybullet.h \
 	mouse.h \
 	qgraphicsscenecustom.h
 SOURCES += \
+    choicelevel.cpp \
     flybullet.cpp \
 	main.cpp \
         mouse.cpp \
@@ -22,4 +24,7 @@ RESOURCES += \
 
 DISTFILES += \
     README.md
+
+FORMS += \
+    choicelevel.ui
 

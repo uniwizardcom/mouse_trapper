@@ -4,5 +4,6 @@
         <file>images/crosshair-symmetry-sniper.png</file>
         <file>images/bullet.png</file>
         <file>images/dziura.png</file>
+        <file>images/crosshair-symmetry-sniper_red.png</file>
     </qresource>
 </RCC>

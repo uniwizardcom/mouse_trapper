@@ -31,7 +31,7 @@ private:
     int bulletY;
 
 public:
-Q_SIGNAL void destBullet(FlyBullet*);
+    Q_SIGNAL void destBullet(FlyBullet*);
 
 public slots:
     void flyBullet();
