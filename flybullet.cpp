@@ -5,7 +5,6 @@
 
 #include "flybullet.h"
 #include <QTimer>
-#include <QDebug>
 
 FlyBullet::FlyBullet(QObject *parent)
     : QThread{parent}

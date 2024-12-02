@@ -6,7 +6,6 @@
 #include "qgraphicsscenecustom.h"
 #include "mouse.h"
 #include "qgraphicsitem.h"
-#include <QDebug>
 #include <QGraphicsSceneMouseEvent>
 #include <flybullet.h>
 #include <QString>
@@ -40,6 +39,9 @@ void QGraphicsSceneCustom::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
         connect(fb, &FlyBullet::destBullet, this, &QGraphicsSceneCustom::flyBulletFinished);
         fb->start();
     }
+    else if(!this->items().count()) {
+        this->setNewLevel(1);
+    }
 }
 
 void QGraphicsSceneCustom::flyBulletFinished(FlyBullet *fb)
@@ -47,7 +49,10 @@ void QGraphicsSceneCustom::flyBulletFinished(FlyBullet *fb)
     QPixmap p = QPixmap(":/images/dziura_2.png").scaledToHeight(100);
 
     QGraphicsPixmapItem *dz = new QGraphicsPixmapItem(p);
-    dz->setPos(fb->bulletDestX, fb->bulletDestY);
+    dz->setPos(
+        fb->bulletDestX - (p.width() / 2),
+        fb->bulletDestY - (p.height() / 2)
+        );
     this->addItem(dz);
 
     this->removeItem(fb->bulletItem);
@@ -63,7 +68,6 @@ int QGraphicsSceneCustom::countOfMice()
 {
     int m = 0;
 
-    qDebug() << "Items: " << this->items().size();
     foreach (QGraphicsItem *t, this->items()) {
         QString toc = QString(typeid(*t).name());
         if(toc.right(5) == "Mouse") {
@@ -82,7 +86,6 @@ void QGraphicsSceneCustom::choiceLevel()
             this->choiceLevelDialog->hideNextButton();
             this->withWorkingButtons = true;
         }
-        qDebug() << "this->nextLevel QGraphicsSceneCustom::choiceLevel: " << this->nextLevel;
         this->choiceLevelDialog->setNextLevel(this->nextLevel);
 
         QObject::connect(this->choiceLevelDialog, &ChoiceLevel::levelRestart, this, &QGraphicsSceneCustom::gotoLevelRestart);
@@ -108,30 +111,29 @@ void QGraphicsSceneCustom::setNewLevel(int miceCount)
 
     for (int i = 0; i < miceCount; ++i) {
         Mouse *mouse = new Mouse;
-        mouse->setPos(::sin((i * 6.28) / miceCount) * 200,
-                      ::cos((i * 6.28) / miceCount) * 200);
+        mouse->setPos(
+            ::sin((i * 6.28) / miceCount) * 200,
+            ::cos((i * 6.28) / miceCount) * 200
+            );
 
         mouse->setCursor(cr);
 
         this->addItem(mouse);
     }
 
-    qDebug() << "this->miceCount QGraphicsSceneCustom::setNewLevel: " << this->miceCount;
-    this->choiceLevel();
+    if(miceCount) {
+        this->choiceLevel();
+    }
 }
 
 void QGraphicsSceneCustom::gotoLevelRestart()
 {
-    qDebug() << "this->miceCount QGraphicsSceneCustom::gotoLevelRestart: " << this->miceCount ;
-
     this->setNewLevel(this->miceCount);
     this->choiceLevelRejected();
 }
 
 void QGraphicsSceneCustom::gotoLevelUp()
 {
-    qDebug() << "this->miceCount QGraphicsSceneCustom::gotoLevelUp: " << this->miceCount +1 ;
-
     this->setNewLevel(this->miceCount +1);
     this->choiceLevelRejected();
 }
@@ -140,7 +142,6 @@ void QGraphicsSceneCustom::choiceLevelRejected()
 {
     if(this->choiceLevelDialog) {
         this->choiceLevelDialog->close();
-        // delete this->choiceLevelDialog;
     }
     this->choiceLevelDialog = nullptr;
 }

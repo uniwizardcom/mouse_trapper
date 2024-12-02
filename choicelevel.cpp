@@ -2,7 +2,7 @@
 #include "ui_choicelevel.h"
 
 ChoiceLevel::ChoiceLevel(QWidget *parent)
-    : QDialog(parent)
+    : QDialog(parent, Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowMinMaxButtonsHint )
     , ui(new Ui::ChoiceLevel)
 {
     ui->setupUi(this);
@@ -19,7 +19,6 @@ void ChoiceLevel::setNextLevel(int nextLevel)
 
     ui->pushButton->setText( QString("Start level\n%1").arg(nextLevel) );
 
-    qDebug() << "ui->pushButton_2->isHidden(): " << (ui->pushButton_2->isHidden() ? "tak" : "nie");
     if(!ui->pushButton_2->isHidden()) {
         this->setWindowTitle("Brawo! Select level :)");
         ui->pushButton_2->setText( QString("Retart level: %1").arg(nextLevel - 1) );

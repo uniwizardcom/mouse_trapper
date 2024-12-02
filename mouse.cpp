@@ -16,10 +16,9 @@ constexpr qreal TwoPi = 2 * M_PI;
 
 static qreal normalizeAngle(qreal angle)
 {
-    while (angle < 0)
-        angle += TwoPi;
-    while (angle > TwoPi)
-        angle -= TwoPi;
+    while (angle < 0) angle += TwoPi;
+    while (angle > TwoPi) angle -= TwoPi;
+
     return angle;
 }
 
@@ -34,8 +33,13 @@ Mouse::Mouse() : color(QRandomGenerator::global()->bounded(256),
 QRectF Mouse::boundingRect() const
 {
     qreal adjust = 0.5;
-    return QRectF(-18 - adjust, -22 - adjust,
-                  36 + adjust, 60 + adjust);
+
+    return QRectF(
+        -18 - adjust,
+        -22 - adjust,
+        36 + adjust,
+        60 + adjust
+        );
 }
 
 QPainterPath Mouse::shape() const

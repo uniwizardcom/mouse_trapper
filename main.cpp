@@ -7,8 +7,6 @@
 #include <QGraphicsView>
 #include "qgraphicsscenecustom.h"
 
-// static constexpr int MouseCount = 1;
-
 int main(int argc, char **argv)
 {
     QApplication app(argc, argv);
@@ -17,17 +15,19 @@ int main(int argc, char **argv)
     scene.setSceneRect(-300, -300, 600, 600);
     scene.setItemIndexMethod(QGraphicsScene::NoIndex);
 
-    scene.setNewLevel(1);
+    scene.setNewLevel(0);
 
     QPixmap ps = QPixmap(":/images/crosshair-symmetry-sniper.png").scaledToWidth(100);
     QCursor c = QCursor(ps, ps.width() / 2, ps.height() / 2);
     QGuiApplication::setOverrideCursor(c);
 
+    QIcon ic = QIcon(QPixmap(":/images/ikonka.png"));
+    QGuiApplication::setWindowIcon(ic);
+
 
     QTimer timer;
     QObject::connect(&timer, &QTimer::timeout, &scene, &QGraphicsScene::advance);
     timer.start(1000 / 33);
-
 
     QGraphicsView *view = new QGraphicsView();
 
