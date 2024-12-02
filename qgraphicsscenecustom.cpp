@@ -44,7 +44,7 @@ void QGraphicsSceneCustom::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 
 void QGraphicsSceneCustom::flyBulletFinished(FlyBullet *fb)
 {
-    QPixmap p = QPixmap(":/images/dziura.png").scaledToHeight(100);
+    QPixmap p = QPixmap(":/images/dziura_2.png").scaledToHeight(100);
 
     QGraphicsPixmapItem *dz = new QGraphicsPixmapItem(p);
     dz->setPos(fb->bulletDestX, fb->bulletDestY);
