@@ -1,11 +1,14 @@
 <RCC>
     <qresource prefix="/">
         <file>images/cheese.jpg</file>
-        <file>images/crosshair-symmetry-sniper.png</file>
         <file>images/bullet.png</file>
         <file>images/dziura.png</file>
-        <file>images/crosshair-symmetry-sniper_red.png</file>
         <file>images/dziura_2.png</file>
         <file>images/ikonka.png</file>
+        <file>images/trap_hole.png</file>
+        <file>html/reklama.html</file>
+        <file>videos/reklama.webm</file>
+        <file>images/crosshair-sniper-default.png</file>
+        <file>images/crosshair-sniper-red.png</file>
     </qresource>
 </RCC>
