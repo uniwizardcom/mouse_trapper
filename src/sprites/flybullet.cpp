@@ -6,16 +6,16 @@
 #include "flybullet.h"
 #include <QTimer>
 
-FlyBullet::FlyBullet(QObject *parent)
+Sprites::FlyBullet::FlyBullet(QObject *parent)
     : QThread{parent}
 {
 }
 
-FlyBullet::~FlyBullet()
+Sprites::FlyBullet::~FlyBullet()
 {
 }
 
-void FlyBullet::run()
+void Sprites::FlyBullet::run()
 {
     this->bulletTimer = new QTimer();
     connect(this->bulletTimer, &QTimer::timeout, this, QOverload<>::of(&FlyBullet::flyBullet));
@@ -24,7 +24,7 @@ void FlyBullet::run()
     exec();
 }
 
-void FlyBullet::flyBullet()
+void Sprites::FlyBullet::flyBullet()
 {
     int x = this->bulletItem->pos().x() - 10;
     int y  = this->bulletItem->pos().y() - 10;

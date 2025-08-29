@@ -2,14 +2,15 @@
  * Developer: Uniwizard Wojciech Niewiadomski
  * Main graphics designer: Julian Niewiadomski
  * */
-#ifndef FLYBULLET_H
-#define FLYBULLET_H
+#ifndef SPRITES_FLYBULLET_H
+#define SPRITES_FLYBULLET_H
 
 #include "mouse.h"
 #include <QThread>
 #include <QGraphicsPixmapItem>
 #include <QTime>
 
+namespace Sprites {
 class FlyBullet : public QThread
 {
     Q_OBJECT
@@ -37,5 +38,6 @@ public slots:
     void flyBullet();
 
 };
+}
 
-#endif // FLYBULLET_H
+#endif // SPRITES_FLYBULLET_H

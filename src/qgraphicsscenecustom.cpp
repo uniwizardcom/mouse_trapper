@@ -9,7 +9,8 @@
 #include <QGraphicsSceneMouseEvent>
 #include "sprites/flybullet.h"
 #include <QString>
-#include "sprites/traphole.h"
+#include <QResizeEvent>
+#include "tools/traphole.h"
 
 QGraphicsSceneCustom::QGraphicsSceneCustom(QObject *parent)
     : QGraphicsScene{parent}
@@ -19,13 +20,19 @@ QGraphicsSceneCustom::QGraphicsSceneCustom(QObject *parent)
     QObject::connect(this, &QGraphicsSceneCustom::noMiceOnScene, this, &QGraphicsSceneCustom::choiceLevel);
 }
 
+void QGraphicsSceneCustom::mousePressEvent(QGraphicsSceneMouseEvent *event)
+{
+    emit this->mousePressEventCustom(event);
+}
+
 void QGraphicsSceneCustom::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
     QPointF qpf = event->scenePos();
-    Mouse *mit = (Mouse*)this->itemAt(qpf, QTransform());
+    Sprites::Mouse *mit = (Sprites::Mouse*)this->itemAt(qpf, QTransform());
 
-    if(!Mouse::isQGraphicsItem(mit)) {
-        qDebug() << "It's not a Mouse!";
+    emit this->mouseReleaseEventCustom(event);
+
+    if(!Sprites::Mouse::isQGraphicsItem(mit)) {
         return;
     }
 
@@ -34,42 +41,39 @@ void QGraphicsSceneCustom::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 
         QPixmap p = QPixmap(":/images/bullet.png").scaledToHeight(100);
 
-        FlyBullet *fb = new FlyBullet(this);
+        Sprites::FlyBullet *fb = new Sprites::FlyBullet(this);
         fb->bulletDestX = qpf.x();
         fb->bulletDestY = qpf.y();
         fb->bulletItem = new QGraphicsPixmapItem(p);
         fb->bulletItem->setPos(600, 600);
         fb->mouse = mit;
+        fb->mouse->lastX = fb->bulletDestX;
+        fb->mouse->lastY = fb->bulletDestY;
         this->addItem(fb->bulletItem);
 
-        connect(fb, &FlyBullet::destBullet, this, &QGraphicsSceneCustom::flyBulletFinished);
+        connect(fb, &Sprites::FlyBullet::destBullet, this, &QGraphicsSceneCustom::flyBulletFinished);
         fb->start();
     }
     else if(!this->items().count()) {
         this->setNewLevel(1);
     }
-
-    // this->showTrapHole(qpf.x(), qpf.y());
 }
 
-void QGraphicsSceneCustom::flyBulletFinished(FlyBullet *fb)
+void QGraphicsSceneCustom::viewResizeEvent(QResizeEvent *event)
 {
-    QPixmap p = QPixmap(":/images/dziura_2.png").scaledToHeight(100);
+    this->viewSize = event->size();
+}
 
-    QGraphicsPixmapItem *dz = new QGraphicsPixmapItem(p);
-    dz->setPos(
-        fb->bulletDestX - (p.width() / 2),
-        fb->bulletDestY - (p.height() / 2)
-        );
-    this->addItem(dz);
+QSize QGraphicsSceneCustom::getViewSize()
+{
+    return this->viewSize;
+}
 
+void QGraphicsSceneCustom::flyBulletFinished(Sprites::FlyBullet *fb)
+{
     this->removeItem(fb->bulletItem);
     if(fb->mouse) {
-        this->removeItem(fb->mouse);
-        if(!this->countOfMice()) {
-            this->nextLevel = this->miceCount +1;
-            emit noMiceOnScene();
-        }
+        fb->mouse->kill();
     }
 }
 
@@ -77,12 +81,17 @@ int QGraphicsSceneCustom::countOfMice()
 {
     int m = 0;
     foreach (QGraphicsItem *t, this->items()) {
-        if(Mouse::isQGraphicsItem(t)) {
+        if(Sprites::Mouse::isQGraphicsItem(t) && !((Sprites::Mouse*)t)->isTrapped) {
             m++;
         }
     }
 
     return m;
+}
+
+int QGraphicsSceneCustom::getLevel()
+{
+    return this->miceCount;
 }
 
 void QGraphicsSceneCustom::choiceLevel()
@@ -106,21 +115,19 @@ void QGraphicsSceneCustom::choiceLevel()
 
 void QGraphicsSceneCustom::clearScene()
 {
-    // this->clear();
     foreach (QGraphicsItem *t, this->items()) {
         if(t->isWidget()) {
             continue;
         }
-        // qDebug() << "Removed item: " << t->isWidget();
 
         this->removeItem(t);
     }
-
-    this->refreshControls();
 }
 
 void QGraphicsSceneCustom::setNewLevel(int miceCount)
 {
+    emit levelChange(this->nextLevel, miceCount);
+
     this->miceCount = miceCount;
     if(this->nextLevel == 0) {
         this->nextLevel = miceCount;
@@ -129,19 +136,37 @@ void QGraphicsSceneCustom::setNewLevel(int miceCount)
     this->clearScene();
 
     for (int i = 0; i < miceCount; ++i) {
-        Mouse *mouse = new Mouse;
+        Sprites::Mouse *mouse = new Sprites::Mouse;
         mouse->setPos(
             ::sin((i * 6.28) / miceCount) * 200,
             ::cos((i * 6.28) / miceCount) * 200
             );
 
         mouse->setCursor(this->miceCursor);
+        QObject::connect(mouse, &Sprites::Mouse::spriteIsKilled, this, &QGraphicsSceneCustom::spriteIsKilled);
 
         this->addItem(mouse);
     }
 
     if(miceCount) {
         this->choiceLevel();
+    }
+}
+
+void QGraphicsSceneCustom::spriteIsKilled(QGraphicsItem *t)
+{
+    if(Sprites::Mouse::isQGraphicsItem(t) && ((Sprites::Mouse*)t)->isDeadBodyVisible()) {
+        Tools::TrapHole *th = new Tools::TrapHole();
+        th->setPos(
+            t->pos().x() - (th->pixmap().size().width() / 2),
+            t->pos().y() - (th->pixmap().size().height() / 2)
+        );
+        this->addItem(th);
+    }
+
+    if(!this->countOfMice()) {
+        this->nextLevel = this->miceCount +1;
+        emit noMiceOnScene();
     }
 }
 
@@ -155,6 +180,7 @@ void QGraphicsSceneCustom::gotoLevelUp()
 {
     this->setNewLevel(this->miceCount +1);
     this->choiceLevelRejected();
+    emit this->levelUp();
 }
 
 void QGraphicsSceneCustom::choiceLevelRejected()
@@ -165,54 +191,12 @@ void QGraphicsSceneCustom::choiceLevelRejected()
     this->choiceLevelDialog = nullptr;
 }
 
-void QGraphicsSceneCustom::showTrapHole(qreal x, qreal y)
-{
-    TrapHole *trapHole = new TrapHole(this);
-
-    QObject::connect(trapHole, &TrapHole::miceInHole, this, &QGraphicsSceneCustom::miceInHole);
-
-    trapHole->setPos(
-        x - (trapHole->pixmap().width() / 2),
-        y - (trapHole->pixmap().height() / 2)
-    );
-
-    this->addItem(trapHole);
-}
-
-void QGraphicsSceneCustom::miceInHole()
-{
-    if(!this->countOfMice()) {
-        this->nextLevel = this->miceCount +1;
-        emit noMiceOnScene();
-    }
-}
-
-void QGraphicsSceneCustom::setMenu(Menu *menu)
+void QGraphicsSceneCustom::setMenu(MenuWg *menu)
 {
     this->menu = menu;
-    qDebug() << "Menu set";
 }
 
 void QGraphicsSceneCustom::setMiceCursor(const QCursor &miceCursor)
 {
     this->miceCursor = (QCursor)miceCursor;
 }
-
-void QGraphicsSceneCustom::refreshControls()
-{
-    /*
-    if(!this->menu) {
-        qDebug() << "Menu null";
-    }
-    else if(this->menu->parentScene() == nullptr) {
-        qDebug() << "Menu parent: nullptr";
-        this->menu->setParentScene(this);
-        this->addWidget(this->menu);
-    }
-    else {
-        qDebug() << "Menu parent: " << this->menu->parentScene();
-    } */
-
-    // this->menu->setBaseSize(100, 200);
-}
-

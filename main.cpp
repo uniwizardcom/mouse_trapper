@@ -8,7 +8,7 @@
 #include <QWebEngineSettings>
 #include "src/qgraphicsscenecustom.h"
 #include "src/qgraphicsviewcustom.h"
-#include "src/menu.h"
+#include "src/menuwg.h"
 // #include "src/qwebengineview.h"
 
 int main(int argc, char **argv)
@@ -38,10 +38,13 @@ int main(int argc, char **argv)
     view->setCursorDefault(sniperCursorDefault);
     view->setCursorOnTarget(sniperCursorRed);
 
-    Menu *menu = new Menu();
+    MenuWg *menu = new MenuWg();
+    view->setMenu(menu);
+    view->setCustomScene(&scene);
+
     menu->setCursor(QCursor(Qt::ArrowCursor));
     menu->setTrapHolesStartLevel(3);
-    view->setMenu(menu);
+    menu->addMenuButtons();
 
     view->setWindowTitle(QT_TRANSLATE_NOOP(QGraphicsView, "Mice Trapping"));
     view->resize(800, 600);
@@ -54,8 +57,6 @@ int main(int argc, char **argv)
     webview->setUrl(QUrl(QStringLiteral("qrc:/html/reklama.html")));
     webview->resize(1024, 750);
     webview->show();*/
-
-    view->setCustomScene(&scene);
 
     return app.exec();
 }

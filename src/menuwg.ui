@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Menu</class>
- <widget class="QWidget" name="Menu">
+ <class>MenuWg</class>
+ <widget class="QWidget" name="MenuWg">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -17,6 +17,20 @@
    <property name="sizeConstraint">
     <enum>QLayout::SetDefaultConstraint</enum>
    </property>
+   <item row="0" column="0">
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <item>
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>Pan Tytuł tego menu</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <layout class="QGridLayout" name="gridLayout_2"/>
+     </item>
+    </layout>
+   </item>
   </layout>
  </widget>
  <resources/>

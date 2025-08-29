@@ -22,15 +22,15 @@ static qreal normalizeAngle(qreal angle)
     return angle;
 }
 
-Mouse::Mouse() : color(QRandomGenerator::global()->bounded(256),
-                       QRandomGenerator::global()->bounded(256),
-                       QRandomGenerator::global()->bounded(256))
+Sprites::Mouse::Mouse(QObject *parent) :
+    QObject(parent), QGraphicsItem(),
+    color(QRandomGenerator::global()->bounded(256), QRandomGenerator::global()->bounded(256), QRandomGenerator::global()->bounded(256))
 {
     this->isTrapped = false;
     setRotation(QRandomGenerator::global()->bounded(360 * 16));
 }
 
-QRectF Mouse::boundingRect() const
+QRectF Sprites::Mouse::boundingRect() const
 {
     qreal adjust = 0.5;
 
@@ -42,14 +42,14 @@ QRectF Mouse::boundingRect() const
         );
 }
 
-QPainterPath Mouse::shape() const
+QPainterPath Sprites::Mouse::shape() const
 {
     QPainterPath path;
     path.addRect(-10, -20, 20, 40);
     return path;
 }
 
-void Mouse::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
+void Sprites::Mouse::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
     // Body
     painter->setBrush(color);
@@ -82,7 +82,7 @@ void Mouse::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *
     painter->drawPath(path);
 }
 
-void Mouse::advance(int step)
+void Sprites::Mouse::advance(int step)
 {
     if (!step || this->isTrapped)
         return;
@@ -95,15 +95,15 @@ void Mouse::advance(int step)
 
         if (angleToCenter < Pi && angleToCenter > Pi / 4) {
             // Rotate left
-            angle += (angle < -Pi / 2) ? 0.25 : -0.25;
+            this->angle += (this->angle < -Pi / 2) ? 0.25 : -0.25;
         } else if (angleToCenter >= Pi && angleToCenter < (Pi + Pi / 2 + Pi / 4)) {
             // Rotate right
-            angle += (angle < Pi / 2) ? 0.25 : -0.25;
+            this->angle += (this->angle < Pi / 2) ? 0.25 : -0.25;
         }
-    } else if (::sin(angle) < 0) {
-        angle += 0.25;
-    } else if (::sin(angle) > 0) {
-        angle -= 0.25;
+    } else if (::sin(this->angle) < 0) {
+        this->angle += 0.25;
+    } else if (::sin(this->angle) > 0) {
+        this->angle -= 0.25;
     }
 
     // Try not to crash with any other mice
@@ -122,38 +122,74 @@ void Mouse::advance(int step)
 
         if (angleToMouse >= 0 && angleToMouse < Pi / 2) {
             // Rotate right
-            angle += 0.5;
+            this->angle += 0.5;
         } else if (angleToMouse <= TwoPi && angleToMouse > (TwoPi - Pi / 2)) {
             // Rotate left
-            angle -= 0.5;
+            this->angle -= 0.5;
         }
     }
 
     // Add some random movement
     if (dangerMice.size() > 1 && QRandomGenerator::global()->bounded(10) == 0) {
         if (QRandomGenerator::global()->bounded(1))
-            angle += QRandomGenerator::global()->bounded(1 / 500.0);
+            this->angle += QRandomGenerator::global()->bounded(1 / 500.0);
         else
-            angle -= QRandomGenerator::global()->bounded(1 / 500.0);
+            this->angle -= QRandomGenerator::global()->bounded(1 / 500.0);
     }
 
     speed += (-50 + QRandomGenerator::global()->bounded(100)) / 100.0;
 
-    qreal dx = ::sin(angle) * 10;
+    qreal dx = ::sin(this->angle) * 10;
     mouseEyeDirection = (qAbs(dx / 5) < 1) ? 0 : dx / 5;
 
     setRotation(rotation() + dx);
     setPos(mapToParent(0, -(3 + sin(speed) * 3)));
 }
 
-void Mouse::trapped()
+void Sprites::Mouse::trapped()
 {
     this->isTrapped = true;
 }
 
-// Static tools
-bool Mouse::isQGraphicsItem(QGraphicsItem *i)
+void Sprites::Mouse::kill()
 {
+    emit spriteIsKilled(this);
+    this->scene()->removeItem(this);
+}
+
+void Sprites::Mouse::goAway()
+{
+    if (::sin(this->angle) < 0) {
+        this->angle -= 0.3;
+        this->speed -= (-50 + QRandomGenerator::global()->bounded(100)) / 100.0;
+    } else {
+        this->angle += 0.3;
+        this->speed += (-50 + QRandomGenerator::global()->bounded(100)) / 100.0;
+    }
+
+    setPos(mapToParent(0, -(3 + sin(this->speed) * 3)));
+
+    qreal dx = ::sin(this->angle) * 10;
+    setRotation(rotation() + dx);
+}
+
+void Sprites::Mouse::deadBodyVisible(bool deadBody)
+{
+    this->deadBody = deadBody;
+}
+
+bool Sprites::Mouse::isDeadBodyVisible()
+{
+    return this->deadBody;
+}
+
+// Static tools
+bool Sprites::Mouse::isQGraphicsItem(QGraphicsItem *i)
+{
+    if(i == nullptr) {
+        return false;
+    }
+
     return dynamic_cast<Mouse*>(i) != nullptr;
 }
 

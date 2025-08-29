@@ -3,21 +3,29 @@
 
 #include <QGraphicsView>
 #include <QGridLayout>
-#include "menu.h"
+#include "menuwg.h"
 
 class QGraphicsViewCustom : public QGraphicsView
 {
+    Q_OBJECT
+
 public:
     QGraphicsViewCustom();
 
     void setCursorDefault(const QCursor&);
     void setCursorOnTarget(const QCursor&);
-    void setMenu(Menu *menu);
+    void setMenu(MenuWg *menu);
     void setCustomScene(QGraphicsSceneCustom *scene);
 
 private:
-    Menu *menu = nullptr;
+    MenuWg *menu = nullptr;
     QCursor cursorOnTarget;
+    QString windowTitleOrg = "";
+
+public slots:
+    void mouseReleaseEventScene(QGraphicsSceneMouseEvent *);
+    void resizeEvent(QResizeEvent *event) override;
+    void levelChange();
 };
 
 #endif // QGRAPHICSVIEWCUSTOM_H
