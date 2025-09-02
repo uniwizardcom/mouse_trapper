@@ -120,9 +120,7 @@ void QGraphicsSceneCustom::clearScene()
             continue;
         }
 
-        if(t->scene() == this) {
-            this->removeItem(t);
-        }
+        this->removeItem(t);
     }
 }
 
