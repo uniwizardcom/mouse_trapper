@@ -1,7 +1,6 @@
 #include "button.h"
 #include "qapplication.h"
 #include "../qgraphicsscenecustom.h"
-#include "../qgraphicsviewcustom.h"
 #include <QPainter>
 #include <QGraphicsSceneMouseEvent>
 

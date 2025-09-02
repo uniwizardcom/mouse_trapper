@@ -154,7 +154,10 @@ void Sprites::Mouse::trapped()
 void Sprites::Mouse::kill()
 {
     emit spriteIsKilled(this);
-    this->scene()->removeItem(this);
+
+    if(this->isActive()) {
+        this->scene()->removeItem(this);
+    }
 }
 
 void Sprites::Mouse::goAway()
